@@ -15,9 +15,11 @@ class SecondViewController: UIViewController {
     
     @IBOutlet fileprivate weak var scrollView: UIScrollView!
     @IBOutlet fileprivate weak var underView: UIView!
+    fileprivate var orientationChanged: Bool = true
     
     @IBOutlet weak var underviewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomLabelConstraint: NSLayoutConstraint!
+    @IBOutlet weak var underLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +29,13 @@ class SecondViewController: UIViewController {
         scrollView.delegate = self
         (scrollView as! UITableView).dataSource = self
         
+        NotificationCenter.default.addObserver(self, selector: #selector(didRotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        
         // Do any additional setup after loading the view.
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     override func didReceiveMemoryWarning() {
@@ -38,24 +46,47 @@ class SecondViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
+        if orientationChanged {
+            orientationChanged = false
+            
+            // get new insets
+            let statusBarHeight = UIApplication.shared.isStatusBarHidden ? 0 : UIApplication.shared.statusBarFrame.height
+            let underViewHeight = underView.frame.height
+            let navBarHeight = (navigationController?.navigationBar.bounds.height ?? 0)
+            let consentHeight = underViewHeight + statusBarHeight + navBarHeight
+            let edgeInsets = UIEdgeInsetsMake(consentHeight, 0, 0, 0)
+            
+            print("statusBarHeight: \(statusBarHeight), underViewHeight: \(underViewHeight), navBarHeight: \(navBarHeight)")
+            
+            
+            let scrollToTop = (scrollView.contentInset.top == abs(scrollView.contentOffset.y))
+            scrollView.contentInset = edgeInsets
+            scrollView.scrollIndicatorInsets = edgeInsets
+            
+            if scrollToTop {
+                scrollView.setContentOffset(CGPoint(x: 0, y: -1.0 * scrollView.contentInset.top), animated: false)
+            }
+            
+            scrollViewDidScroll(self.scrollView)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        bottomLabelConstraint.isActive = false
+    }
+    
+    func didRotated() {
+        orientationChanged = true
+        
+        underviewHeightConstraint.constant = 100
+        
+        view.setNeedsLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         setHideNavigationBarShadowView(true)
-        
-        let consentHeight = underView.bounds.height + UIApplication.shared.statusBarFrame.height + (navigationController?.navigationBar.bounds.height ?? 0)
-        let edgeInsets = UIEdgeInsetsMake(consentHeight, 0, 0, 0)
-        
-        scrollView.contentInset = edgeInsets
-        scrollView.scrollIndicatorInsets = edgeInsets
         
     }
     
@@ -132,12 +163,12 @@ extension SecondViewController : UIScrollViewDelegate {
         
         underviewHeightConstraint.constant = (yoffset > 0.0) ? 0.0 : abs(yoffset)
     }
+
 }
 
 extension SecondViewController : UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         return tableView.dequeueReusableCell(withIdentifier: "TableCell")!
     }
     

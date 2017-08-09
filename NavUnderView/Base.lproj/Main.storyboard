@@ -114,6 +114,7 @@
                     <connections>
                         <outlet property="bottomLabelConstraint" destination="fFm-Og-JK4" id="8V1-pU-UWH"/>
                         <outlet property="scrollView" destination="z6j-sF-Ill" id="ddk-g4-hY2"/>
+                        <outlet property="underLabel" destination="Mhy-ND-8J6" id="BuP-7z-qsm"/>
                         <outlet property="underView" destination="EHh-un-Cr4" id="0d2-Ff-3ve"/>
                         <outlet property="underviewHeightConstraint" destination="OKZ-0T-CQo" id="pvq-Xi-XSH"/>
                     </connections>
