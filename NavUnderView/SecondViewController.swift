@@ -11,15 +11,17 @@ import UIKit
 class SecondViewController: UIViewController {
     
     private var screenEdgePanGestureRecognizer: UIScreenEdgePanGestureRecognizer!
-    private var swipeToBackInteractor : UIPercentDrivenInteractiveTransition?
+    var swipeToBackInteractor : UIPercentDrivenInteractiveTransition?
     
-    @IBOutlet fileprivate weak var scrollView: UIScrollView!
-    @IBOutlet fileprivate weak var underView: UIView!
+    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var underView: UIView!
     fileprivate var orientationChanged: Bool = true
     
     @IBOutlet weak var underviewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomLabelConstraint: NSLayoutConstraint!
     @IBOutlet weak var underLabel: UILabel!
+    
+    fileprivate let animator = SecondViewControllerAnimator()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +33,6 @@ class SecondViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(didRotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         
-        // Do any additional setup after loading the view.
     }
     
     deinit {
@@ -56,9 +57,6 @@ class SecondViewController: UIViewController {
             let consentHeight = underViewHeight + statusBarHeight + navBarHeight
             let edgeInsets = UIEdgeInsetsMake(consentHeight, 0, 0, 0)
             
-            print("statusBarHeight: \(statusBarHeight), underViewHeight: \(underViewHeight), navBarHeight: \(navBarHeight)")
-            
-            
             let scrollToTop = (scrollView.contentInset.top == abs(scrollView.contentOffset.y))
             scrollView.contentInset = edgeInsets
             scrollView.scrollIndicatorInsets = edgeInsets
@@ -72,7 +70,9 @@ class SecondViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        super.viewWillAppear(animated)
+        
+        navigationController?.delegate = self
     }
     
     func didRotated() {
@@ -138,9 +138,11 @@ class SecondViewController: UIViewController {
             navigationController!.popViewController(animated: true)
             
         case .changed:
+            
             swipeToBackInteractor?.update(progress)
 
         case .cancelled, .ended:
+            
             if progress > 0.5 {
                 swipeToBackInteractor?.finish()
             } else {
@@ -153,6 +155,26 @@ class SecondViewController: UIViewController {
             print("Swift switch must be exhaustive, thus the default")
         }
     }
+    
+}
+
+extension SecondViewController : UINavigationControllerDelegate {
+
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        
+        if operation == .pop {
+            animator.presenting = false
+            return animator
+        }
+        
+        return nil
+    }
+    
+    func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        return swipeToBackInteractor
+    }
+    
+    
 }
 
 extension SecondViewController : UIScrollViewDelegate {
@@ -167,7 +189,6 @@ extension SecondViewController : UIScrollViewDelegate {
 }
 
 extension SecondViewController : UITableViewDataSource {
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         return tableView.dequeueReusableCell(withIdentifier: "TableCell")!
     }
