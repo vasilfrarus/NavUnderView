@@ -18,6 +18,8 @@ class SecondViewController: UIViewController {
     fileprivate var orientationChanged: Bool = true
     
     @IBOutlet weak var underviewHeightConstraint: NSLayoutConstraint!
+    var underviewHeightConstraintConstantDefault: CGFloat!
+    var underviewHeightDefault: CGFloat?
     @IBOutlet weak var bottomLabelConstraint: NSLayoutConstraint!
     @IBOutlet weak var underLabel: UILabel!
     
@@ -25,6 +27,8 @@ class SecondViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        underviewHeightConstraintConstantDefault = underviewHeightConstraint.constant
         
         installGestureRecognizer()
         
@@ -66,6 +70,8 @@ class SecondViewController: UIViewController {
             }
             
             scrollViewDidScroll(self.scrollView)
+            
+            underviewHeightDefault = underViewHeight
         }
     }
 
@@ -78,7 +84,7 @@ class SecondViewController: UIViewController {
     func didRotated() {
         orientationChanged = true
         
-        underviewHeightConstraint.constant = 100
+        underviewHeightConstraint.constant = underviewHeightConstraintConstantDefault
         
         view.setNeedsLayout()
     }
@@ -178,12 +184,32 @@ extension SecondViewController : UINavigationControllerDelegate {
 }
 
 extension SecondViewController : UIScrollViewDelegate {
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let navStatusHeight = UIApplication.shared.statusBarFrame.height + (navigationController?.navigationBar.bounds.height ?? 0)
 
         let yoffset = scrollView.contentOffset.y + navStatusHeight
         
         underviewHeightConstraint.constant = (yoffset > 0.0) ? 0.0 : abs(yoffset)
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        guard let underviewHeightDefault = underviewHeightDefault else { return }
+        
+        let actualHeight = underviewHeightConstraint.constant
+        guard actualHeight > 0.0 && actualHeight < underviewHeightDefault  else { return }
+        
+        let scrollToTop = actualHeight < underviewHeightDefault/2.0
+        underviewHeightConstraint.constant = scrollToTop ? 0 : underviewHeightDefault
+        
+        UIView.animate(withDuration: 0.25, animations: { [weak self] in
+            let strongSelf = self!
+            
+            strongSelf.view.layoutIfNeeded()
+            let yoffset = strongSelf.scrollView.contentOffset.y
+            strongSelf.scrollView.contentOffset.y = scrollToTop ? yoffset + actualHeight : yoffset - (underviewHeightDefault - actualHeight)
+        })
+        
     }
 
 }
