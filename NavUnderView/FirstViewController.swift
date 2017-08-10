@@ -60,7 +60,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
         
         let fromVCHeightConstraint = fromVC.underviewHeightConstraint
         let fromVCHeightConstraintConst = fromVCHeightConstraint!.constant
-        fromVCHeightConstraint!.constant = 0
+        fromVCHeightConstraint!.constant = fromVC.underviewCollapsedHeight
         
         let underView = fromVC.underView!
         let underViewHeight = underView.bounds.height

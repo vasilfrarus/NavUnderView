@@ -18,8 +18,10 @@ class SecondViewController: UIViewController {
     fileprivate var orientationChanged: Bool = true
     
     @IBOutlet weak var underviewHeightConstraint: NSLayoutConstraint!
+    let underviewCollapsedHeight: CGFloat = 0.5
     var underviewHeightConstraintConstantDefault: CGFloat!
     var underviewHeightDefault: CGFloat?
+    
     @IBOutlet weak var bottomLabelConstraint: NSLayoutConstraint!
     @IBOutlet weak var underLabel: UILabel!
     
@@ -35,8 +37,20 @@ class SecondViewController: UIViewController {
         scrollView.delegate = self
         (scrollView as! UITableView).dataSource = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(didRotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        // relocate shadowView
         
+        let lineView = UIView(frame: CGRect.zero)
+        lineView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3)
+        
+        underView.addSubview(lineView)
+        
+        lineView.translatesAutoresizingMaskIntoConstraints = false
+        lineView.bottomAnchor.constraint(equalTo: underView.bottomAnchor).isActive = true
+        lineView.leftAnchor.constraint(equalTo: underView.leftAnchor).isActive = true
+        lineView.rightAnchor.constraint(equalTo: underView.rightAnchor).isActive = true
+        lineView.heightAnchor.constraint(equalToConstant: underviewCollapsedHeight).isActive = true
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didRotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     }
     
     deinit {
@@ -96,26 +110,28 @@ class SecondViewController: UIViewController {
         
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         
         setHideNavigationBarShadowView(false)
     }
     
-    func setHideNavigationBarShadowView(_ hide: Bool) {
+    func findShadowImage(under view: UIView) -> UIImageView? {
         
-        func findShadowImage(under view: UIView) -> UIImageView? {
-            if view is UIImageView && view.bounds.size.height <= 3 {
-                return (view as! UIImageView)
-            }
-            
-            for subview in view.subviews {
-                if let imageView = findShadowImage(under: subview) {
-                    return imageView
-                }
-            }
-            return nil
+        if view is UIImageView && view.bounds.size.height <= 3 {
+            return (view as! UIImageView)
         }
+        
+        for subview in view.subviews {
+            if let imageView = findShadowImage(under: subview) {
+                return imageView
+            }
+        }
+        
+        return nil
+    }
+
+    func setHideNavigationBarShadowView(_ hide: Bool) {
         
         if let navBar = navigationController?.navigationBar, let view = findShadowImage(under: navBar) {
             
@@ -189,18 +205,18 @@ extension SecondViewController : UIScrollViewDelegate {
         let navStatusHeight = UIApplication.shared.statusBarFrame.height + (navigationController?.navigationBar.bounds.height ?? 0)
 
         let yoffset = scrollView.contentOffset.y + navStatusHeight
-        
-        underviewHeightConstraint.constant = (yoffset > 0.0) ? 0.0 : abs(yoffset)
+
+        underviewHeightConstraint.constant = (yoffset >= 0.0) ? underviewCollapsedHeight : abs(yoffset)
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard let underviewHeightDefault = underviewHeightDefault else { return }
         
         let actualHeight = underviewHeightConstraint.constant
-        guard actualHeight > 0.0 && actualHeight < underviewHeightDefault  else { return }
+        guard actualHeight > underviewCollapsedHeight && actualHeight < underviewHeightDefault  else { return }
         
         let scrollToTop = actualHeight < underviewHeightDefault/2.0
-        underviewHeightConstraint.constant = scrollToTop ? 0 : underviewHeightDefault
+        underviewHeightConstraint.constant = scrollToTop ? underviewCollapsedHeight : underviewHeightDefault
         
         UIView.animate(withDuration: 0.25, animations: { [weak self] in
             let strongSelf = self!
@@ -208,13 +224,14 @@ extension SecondViewController : UIScrollViewDelegate {
             strongSelf.view.layoutIfNeeded()
             let yoffset = strongSelf.scrollView.contentOffset.y
             strongSelf.scrollView.contentOffset.y = scrollToTop ? yoffset + actualHeight : yoffset - (underviewHeightDefault - actualHeight)
-        })
-        
+            }, completion: nil
+        )
     }
 
 }
 
 extension SecondViewController : UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         return tableView.dequeueReusableCell(withIdentifier: "TableCell")!
     }
