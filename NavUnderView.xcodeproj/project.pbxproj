@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		841CABAE1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841CABAD1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift */; };
 		845D2E931F3B0C360086B03F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845D2E921F3B0C360086B03F /* AppDelegate.swift */; };
 		845D2E981F3B0C360086B03F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 845D2E961F3B0C360086B03F /* Main.storyboard */; };
 		845D2E9A1F3B0C360086B03F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 845D2E991F3B0C360086B03F /* Assets.xcassets */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		841CABAD1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationBar+setHideNavigationBarShadowView.swift"; sourceTree = "<group>"; };
 		845D2E8F1F3B0C360086B03F /* NavUnderView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NavUnderView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		845D2E921F3B0C360086B03F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		845D2E971F3B0C360086B03F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -60,6 +62,7 @@
 				845D2E961F3B0C360086B03F /* Main.storyboard */,
 				845D2EA41F3B0D200086B03F /* FirstViewController.swift */,
 				845D2EA61F3B0D2E0086B03F /* SecondViewController.swift */,
+				841CABAD1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift */,
 				845D2E991F3B0C360086B03F /* Assets.xcassets */,
 				845D2E9B1F3B0C360086B03F /* LaunchScreen.storyboard */,
 				845D2E9E1F3B0C360086B03F /* Info.plist */,
@@ -141,6 +144,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				845D2EA71F3B0D2E0086B03F /* SecondViewController.swift in Sources */,
+				841CABAE1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift in Sources */,
 				845D2EA51F3B0D200086B03F /* FirstViewController.swift in Sources */,
 				845D2E931F3B0C360086B03F /* AppDelegate.swift in Sources */,
 			);
@@ -308,6 +312,7 @@
 				845D2EA31F3B0C360086B03F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

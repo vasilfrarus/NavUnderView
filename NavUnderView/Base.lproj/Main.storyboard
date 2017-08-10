@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--First View Controller-->
+        <!--123-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="FirstViewController" customModule="NavUnderView" customModuleProvider="target" sceneMemberID="viewController">
@@ -36,7 +36,9 @@
                             <constraint firstItem="PwK-ex-bsA" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="rAX-rE-OeM"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="Gt8-Rd-lep"/>
+                    <navigationItem key="navigationItem" title="123" id="Gt8-Rd-lep">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="IJx-cz-jD1"/>
+                    </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

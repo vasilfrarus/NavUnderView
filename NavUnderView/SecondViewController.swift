@@ -106,38 +106,14 @@ class SecondViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        setHideNavigationBarShadowView(true)
+        navigationController?.navigationBar.setHideShadowView(true)
         
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        setHideNavigationBarShadowView(false)
-    }
-    
-    func findShadowImage(under view: UIView) -> UIImageView? {
-        
-        if view is UIImageView && view.bounds.size.height <= 3 {
-            return (view as! UIImageView)
-        }
-        
-        for subview in view.subviews {
-            if let imageView = findShadowImage(under: subview) {
-                return imageView
-            }
-        }
-        
-        return nil
-    }
-
-    func setHideNavigationBarShadowView(_ hide: Bool) {
-        
-        if let navBar = navigationController?.navigationBar, let view = findShadowImage(under: navBar) {
-            
-            view.isHidden = hide
-        }
-    
+        navigationController?.navigationBar.setHideShadowView(false)
     }
     
     func installGestureRecognizer() {
