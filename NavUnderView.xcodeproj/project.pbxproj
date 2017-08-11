@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C8C426C3307084C0B124D8C /* Pods_NavUnderView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B93BE00CBBA11775A8D2A71 /* Pods_NavUnderView.framework */; };
 		841CABAE1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841CABAD1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift */; };
 		845D2E931F3B0C360086B03F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845D2E921F3B0C360086B03F /* AppDelegate.swift */; };
 		845D2E981F3B0C360086B03F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 845D2E961F3B0C360086B03F /* Main.storyboard */; };
@@ -17,6 +18,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		09D284C4E38A6B74F2C0DEDD /* Pods-NavUnderView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NavUnderView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NavUnderView/Pods-NavUnderView.debug.xcconfig"; sourceTree = "<group>"; };
+		1F656A3F199874A0AD37E978 /* Pods-NavUnderView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NavUnderView.release.xcconfig"; path = "Pods/Target Support Files/Pods-NavUnderView/Pods-NavUnderView.release.xcconfig"; sourceTree = "<group>"; };
+		6B93BE00CBBA11775A8D2A71 /* Pods_NavUnderView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NavUnderView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		841CABAD1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationBar+setHideNavigationBarShadowView.swift"; sourceTree = "<group>"; };
 		845D2E8F1F3B0C360086B03F /* NavUnderView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NavUnderView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		845D2E921F3B0C360086B03F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -33,17 +37,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C8C426C3307084C0B124D8C /* Pods_NavUnderView.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3213E0E1BAD811E8FBEFE935 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				09D284C4E38A6B74F2C0DEDD /* Pods-NavUnderView.debug.xcconfig */,
+				1F656A3F199874A0AD37E978 /* Pods-NavUnderView.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		6F79F49576B522157D31066D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6B93BE00CBBA11775A8D2A71 /* Pods_NavUnderView.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		845D2E861F3B0C360086B03F = {
 			isa = PBXGroup;
 			children = (
 				845D2E911F3B0C360086B03F /* NavUnderView */,
 				845D2E901F3B0C360086B03F /* Products */,
+				3213E0E1BAD811E8FBEFE935 /* Pods */,
+				6F79F49576B522157D31066D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -77,9 +101,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 845D2EA11F3B0C360086B03F /* Build configuration list for PBXNativeTarget "NavUnderView" */;
 			buildPhases = (
+				D11345F8BA45422FB16AF437 /* [CP] Check Pods Manifest.lock */,
 				845D2E8B1F3B0C360086B03F /* Sources */,
 				845D2E8C1F3B0C360086B03F /* Frameworks */,
 				845D2E8D1F3B0C360086B03F /* Resources */,
+				316614E85E4EB8D93F97A866 /* [CP] Embed Pods Frameworks */,
+				3CC3D0CDE84F6DEBDA527500 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -137,6 +164,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		316614E85E4EB8D93F97A866 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-NavUnderView/Pods-NavUnderView-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3CC3D0CDE84F6DEBDA527500 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-NavUnderView/Pods-NavUnderView-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D11345F8BA45422FB16AF437 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		845D2E8B1F3B0C360086B03F /* Sources */ = {
@@ -269,6 +344,7 @@
 		};
 		845D2EA21F3B0C360086B03F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 09D284C4E38A6B74F2C0DEDD /* Pods-NavUnderView.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = C69Q9E6SNL;
@@ -282,6 +358,7 @@
 		};
 		845D2EA31F3B0C360086B03F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1F656A3F199874A0AD37E978 /* Pods-NavUnderView.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = C69Q9E6SNL;

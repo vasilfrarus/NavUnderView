@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LoremIpsum
 
 class SecondViewController: UIViewController {
     
@@ -20,10 +21,14 @@ class SecondViewController: UIViewController {
     @IBOutlet weak var underviewHeightConstraint: NSLayoutConstraint!
     let underviewCollapsedHeight: CGFloat = 0.5
     var underviewHeightConstraintConstantDefault: CGFloat!
+    var scrollViewDefaultTopInset: CGFloat!
+    var scrollViewDefaultYOffset: CGFloat!
     var underviewHeightDefault: CGFloat?
     
     @IBOutlet weak var bottomLabelConstraint: NSLayoutConstraint!
     @IBOutlet weak var underLabel: UILabel!
+    
+    public var underLabelText: String?
     
     fileprivate let animator = SecondViewControllerAnimator()
     
@@ -49,6 +54,10 @@ class SecondViewController: UIViewController {
         lineView.leftAnchor.constraint(equalTo: underView.leftAnchor).isActive = true
         lineView.rightAnchor.constraint(equalTo: underView.rightAnchor).isActive = true
         lineView.heightAnchor.constraint(equalToConstant: underviewCollapsedHeight).isActive = true
+        
+        if let underLabelText = underLabelText {
+            underLabel.text = underLabelText
+        }
         
         NotificationCenter.default.addObserver(self, selector: #selector(didRotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     }
@@ -86,6 +95,8 @@ class SecondViewController: UIViewController {
             scrollViewDidScroll(self.scrollView)
             
             underviewHeightDefault = underViewHeight
+            scrollViewDefaultTopInset = consentHeight
+            scrollViewDefaultYOffset = -1.0 * scrollView.contentInset.top
         }
     }
 
@@ -112,8 +123,6 @@ class SecondViewController: UIViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        
-        navigationController?.navigationBar.setHideShadowView(false)
     }
     
     func installGestureRecognizer() {
@@ -161,7 +170,6 @@ extension SecondViewController : UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         
         if operation == .pop {
-            animator.presenting = false
             return animator
         }
         
@@ -209,11 +217,28 @@ extension SecondViewController : UIScrollViewDelegate {
 extension SecondViewController : UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return tableView.dequeueReusableCell(withIdentifier: "TableCell")!
+        return tableView.dequeueReusableCell(withIdentifier: "TableCell\(arc4random_uniform(3)+1)")!
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 20
     }
     
+}
+
+
+extension SecondViewController : UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let newVC = (storyboard.instantiateViewController(withIdentifier: "SecondVC") as! SecondViewController)
+        newVC.underLabelText = LoremIpsum.words(withNumber: Int(arc4random_uniform(15)) + 3)
+        self.navigationController?.pushViewController(newVC, animated: true)
+        
+        
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return CGFloat(arc4random_uniform(40)+40)
+    }
 }
