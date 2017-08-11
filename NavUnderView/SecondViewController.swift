@@ -10,6 +10,8 @@ import UIKit
 import LoremIpsum
 
 class SecondViewController: UIViewController {
+
+    static var transitionIsOn: Bool = false
     
     private var screenEdgePanGestureRecognizer: UIScreenEdgePanGestureRecognizer!
     var swipeToBackInteractor : UIPercentDrivenInteractiveTransition?
@@ -142,6 +144,8 @@ class SecondViewController: UIViewController {
         switch gestureRecognizer.state {
             
         case .began:
+            SecondViewController.transitionIsOn = true
+            
             swipeToBackInteractor = UIPercentDrivenInteractiveTransition()
             
             navigationController!.popViewController(animated: true)
@@ -159,6 +163,7 @@ class SecondViewController: UIViewController {
             }
             
             swipeToBackInteractor = nil
+            SecondViewController.transitionIsOn = false
             
         default:
             print("Swift switch must be exhaustive, thus the default")
@@ -187,6 +192,8 @@ extension SecondViewController : UINavigationControllerDelegate {
 extension SecondViewController : UIScrollViewDelegate {
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard !SecondViewController.transitionIsOn else { return } // do not work at transition
+        
         let navStatusHeight = UIApplication.shared.statusBarFrame.height + (navigationController?.navigationBar.bounds.height ?? 0)
         
         let yoffset = scrollView.contentOffset.y + navStatusHeight
@@ -195,9 +202,11 @@ extension SecondViewController : UIScrollViewDelegate {
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        guard !SecondViewController.transitionIsOn else { return } // do not work at transition
+
         guard let underviewHeightDefault = underviewHeightDefault else { return }
         
-        let actualHeight = underviewHeightConstraint.constant
+        let actualHeight = underView.bounds.height // underviewHeightConstraint.constant
         guard actualHeight > underviewCollapsedHeight && actualHeight < underviewHeightDefault  else { return }
         
         let scrollToTop = actualHeight < underviewHeightDefault/2.0
