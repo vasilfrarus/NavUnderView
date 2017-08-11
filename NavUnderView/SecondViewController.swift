@@ -35,6 +35,8 @@ class SecondViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationController?.view.backgroundColor = UIColor.white
+        
         underviewHeightConstraintConstantDefault = underviewHeightConstraint.constant
         
         installGestureRecognizer()
@@ -180,16 +182,15 @@ extension SecondViewController : UINavigationControllerDelegate {
         return swipeToBackInteractor
     }
     
-    
 }
 
 extension SecondViewController : UIScrollViewDelegate {
-    
+
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let navStatusHeight = UIApplication.shared.statusBarFrame.height + (navigationController?.navigationBar.bounds.height ?? 0)
-
+        
         let yoffset = scrollView.contentOffset.y + navStatusHeight
-
+        
         underviewHeightConstraint.constant = (yoffset >= 0.0) ? underviewCollapsedHeight : abs(yoffset)
     }
     
@@ -239,6 +240,7 @@ extension SecondViewController : UITableViewDelegate {
         
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return CGFloat(arc4random_uniform(40)+40)
+        
+        return CGFloat(40)
     }
 }

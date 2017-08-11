@@ -38,7 +38,6 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
     override init() {
         super.init()
         
-        
         if SecondViewControllerAnimator.transitionNavUnderView == nil ||
             SecondViewControllerAnimator.anotherTransitionNavUnderView == nil {
             
@@ -74,33 +73,6 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
             SecondViewControllerAnimator.transitionNavUnderView = getView()
             SecondViewControllerAnimator.anotherTransitionNavUnderView = getView()
             
-        }
-        
-        if SecondViewControllerAnimator.transitionNavUnderView == nil {
-            SecondViewControllerAnimator.transitionNavUnderView = UIView()
-            SecondViewControllerAnimator.transitionNavUnderView?.clipsToBounds = true
-            
-            let navBar = UINavigationBar()
-            SecondViewControllerAnimator.transitionNavUnderView!.addSubview(navBar)
-            
-            navBar.heightAnchor.constraint(equalToConstant: 2000).isActive = true
-            navBar.topAnchor.constraint(equalTo: SecondViewControllerAnimator.transitionNavUnderView!.topAnchor).isActive = true
-            navBar.leftAnchor.constraint(equalTo: SecondViewControllerAnimator.transitionNavUnderView!.leftAnchor).isActive = true
-            navBar.rightAnchor.constraint(equalTo: SecondViewControllerAnimator.transitionNavUnderView!.rightAnchor).isActive = true
-            navBar.translatesAutoresizingMaskIntoConstraints = false
-
-            let lineView = UIView()
-            lineView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3)
-            
-            SecondViewControllerAnimator.transitionNavUnderView!.addSubview(lineView)
-            
-            lineView.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
-            lineView.bottomAnchor.constraint(equalTo: SecondViewControllerAnimator.transitionNavUnderView!.bottomAnchor).isActive = true
-            lineView.leftAnchor.constraint(equalTo: SecondViewControllerAnimator.transitionNavUnderView!.leftAnchor).isActive = true
-            lineView.rightAnchor.constraint(equalTo: SecondViewControllerAnimator.transitionNavUnderView!.rightAnchor).isActive = true
-            lineView.translatesAutoresizingMaskIntoConstraints = false
-            
-            SecondViewControllerAnimator.transitionNavUnderView!.layoutIfNeeded()
         }
         
     }
@@ -227,6 +199,8 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
             
             if (fromVCUnderviewDefaultHeight > toNavVCUnderviewDefaultHeight) {
                 // 1
+                print("last transition #1, fromVCUnderview is small = \(fromVCUnderView.bounds.height == fromVC.underviewCollapsedHeight)")
+
                 toView.addSubview(transitionNavUnderView)
                 
                 toNavVCUnderView.isHidden = true
@@ -275,7 +249,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 
             } else {
                 // 2
-
+                print("last transition #2, fromVCUnderview is small = \(fromVCUnderView.bounds.height == fromVC.underviewCollapsedHeight)")
                 // fromView preparation
                 fromView.addSubview(transitionNavUnderView)
 
@@ -292,6 +266,9 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     fromVCUnderLabel.isHidden = true
                 }
                 
+                if fromVCUnderViewHeight <= fromVC.underviewCollapsedHeight {
+                    labelSnapshot.isHidden = true
+                }
                 
                 // toView preparation
                 let anotherTransitionNavUnderView = SecondViewControllerAnimator.anotherTransitionNavUnderView!
