@@ -358,6 +358,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 transitionNavUnderView.frame.size.height = underviewCollapsedHeight
                 transitionNavUnderView.layoutIfNeeded()
                 
+                fromVCUnderLabel.alpha = 0
                 fromView.layoutIfNeeded()
                 
                 if let toNavVCScrollViewOffset = toNavVCScrollViewOffset {
@@ -370,6 +371,8 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 if let navBar = toVC.navigationController?.navigationBar, !collapsed {
                     navBar.setHideShadowView(false)
                 }
+
+                fromVCUnderLabel.alpha = 1
                 
                 fromVCHeightConstraint!.constant = fromVCHeightConstraintConst
                 
@@ -417,6 +420,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 
                 let labelSnapshot = toNavVCUnderLabel.snapshotView(afterScreenUpdates: true)!
                 labelSnapshot.frame = toNavVCUnderLabel.frame
+                labelSnapshot.alpha = 0
                 transitionNavUnderView.addSubview(labelSnapshot)
                 transitionNavUnderView.layoutIfNeeded()
                 
@@ -428,6 +432,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 let toVCCurrentContentOffset = toNavVCScrollView.contentOffset.y
                 let toVCContentOffsetDiff = toNavVCUnderViewHeight - fromVCUnderViewHeight
                 toNavVCScrollView.contentOffset.y += toVCContentOffsetDiff
+
                 
                 UIView.animate(withDuration: duration, animations: {
                     
@@ -437,6 +442,8 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     // fromView animation
                     fromVCScrollView.contentOffset.y -= fromVCContentOffsetDiff
                     fromView.layoutIfNeeded()
+
+                    fromVCUnderLabel.alpha = 0
                     
                     // toView animation
                     
@@ -445,12 +452,15 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     transitionNavUnderView.layoutIfNeeded()
                     
                     toNavVCScrollView.contentOffset.y -= toVCContentOffsetDiff
+
+                    labelSnapshot.alpha = 1
                     
                 }, completion: { result in
                     // fromView restoration
                     fromVCScrollView.contentOffset.y = fromVCCurrentContentOffset
                     fromVC.underLabel.isHidden = false
                     fromVCHeightConstraint!.constant = fromVCHeightConstraintConst
+                    fromVCUnderLabel.alpha = 1
                     
                     // toView restoration
                     toNavVCUnderView.isHidden = false
@@ -458,6 +468,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     transitionNavUnderView.removeFromSuperview()
                     
                     toNavVCScrollView.contentOffset.y = toVCCurrentContentOffset
+
                     //
                     
                     
@@ -494,6 +505,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 
                 let labelSnapshot2 = toNavVCUnderLabel.snapshotView(afterScreenUpdates: true)!
                 labelSnapshot2.frame = toNavVCUnderLabel.frame
+                labelSnapshot2.alpha = 0
                 anotherTransitionNavUnderView.addSubview(labelSnapshot2)
                 
                 toNavVCUnderView.isHidden = true
@@ -520,6 +532,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     fromVCScrollView.contentOffset.y -= fromVCContentOffsetDiff
                     
                     fromVCUnderLabel.isHidden = false
+                    labelSnapshot.alpha = 0
                     
                     // toView animation
                     anotherTransitionNavUnderView.center.x = toVCUnderLabelCenterX
@@ -528,6 +541,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     
                     toNavVCScrollView.contentOffset.y = toVCCurrentContentOffset
                     
+                    labelSnapshot2.alpha = 1
                     
                 }, completion: { result in
                     // fromView restoration
