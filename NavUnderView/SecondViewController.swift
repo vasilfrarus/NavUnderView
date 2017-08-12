@@ -14,25 +14,25 @@ class SecondViewController: UIViewController {
     static var transitionIsOn: Bool = false
     
     private var screenEdgePanGestureRecognizer: UIScreenEdgePanGestureRecognizer!
-    var swipeToBackInteractor : UIPercentDrivenInteractiveTransition?
+    fileprivate var swipeToBackInteractor : UIPercentDrivenInteractiveTransition?
     
-    @IBOutlet weak var scrollView: UIScrollView!
-    @IBOutlet weak var underView: UIView!
+    @IBOutlet fileprivate weak var scrollView: UIScrollView!
+    @IBOutlet fileprivate weak var underView: UIView!
     fileprivate var orientationChanged: Bool = true
     
     @IBOutlet weak var underviewHeightConstraint: NSLayoutConstraint!
-    let underviewCollapsedHeight: CGFloat = 0.5
-    var underviewHeightConstraintConstantDefault: CGFloat!
-    var scrollViewDefaultTopInset: CGFloat!
-    var scrollViewDefaultYOffset: CGFloat!
-    var underviewHeightDefault: CGFloat?
+    fileprivate static let underviewCollapsedHeight: CGFloat = 0.5
+    fileprivate var underviewHeightConstraintConstantDefault: CGFloat!
+    fileprivate var scrollViewDefaultTopInset: CGFloat!
+    fileprivate var scrollViewDefaultYOffset: CGFloat!
+    fileprivate var underviewHeightDefault: CGFloat?
     
-    @IBOutlet weak var bottomLabelConstraint: NSLayoutConstraint!
-    @IBOutlet weak var underLabel: UILabel!
+    @IBOutlet fileprivate weak var bottomLabelConstraint: NSLayoutConstraint!
+    @IBOutlet fileprivate weak var underLabel: UILabel!
     
     public var underLabelText: String?
     
-    fileprivate let animator = SecondViewControllerAnimator()
+    fileprivate static let animator = SecondViewControllerAnimator()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,7 +57,7 @@ class SecondViewController: UIViewController {
         lineView.bottomAnchor.constraint(equalTo: underView.bottomAnchor).isActive = true
         lineView.leftAnchor.constraint(equalTo: underView.leftAnchor).isActive = true
         lineView.rightAnchor.constraint(equalTo: underView.rightAnchor).isActive = true
-        lineView.heightAnchor.constraint(equalToConstant: underviewCollapsedHeight).isActive = true
+        lineView.heightAnchor.constraint(equalToConstant: SecondViewController.underviewCollapsedHeight).isActive = true
         
         if let underLabelText = underLabelText {
             underLabel.text = underLabelText
@@ -177,7 +177,7 @@ extension SecondViewController : UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         
         if operation == .pop {
-            return animator
+            return SecondViewController.animator
         }
         
         return nil
@@ -198,7 +198,7 @@ extension SecondViewController : UIScrollViewDelegate {
         
         let yoffset = scrollView.contentOffset.y + navStatusHeight
         
-        underviewHeightConstraint.constant = (yoffset >= 0.0) ? underviewCollapsedHeight : abs(yoffset)
+        underviewHeightConstraint.constant = (yoffset >= 0.0) ? SecondViewController.underviewCollapsedHeight : abs(yoffset)
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -207,10 +207,10 @@ extension SecondViewController : UIScrollViewDelegate {
         guard let underviewHeightDefault = underviewHeightDefault else { return }
         
         let actualHeight = underView.bounds.height // underviewHeightConstraint.constant
-        guard actualHeight > underviewCollapsedHeight && actualHeight < underviewHeightDefault  else { return }
+        guard actualHeight > SecondViewController.underviewCollapsedHeight && actualHeight < underviewHeightDefault  else { return }
         
         let scrollToTop = actualHeight < underviewHeightDefault/2.0
-        underviewHeightConstraint.constant = scrollToTop ? underviewCollapsedHeight : underviewHeightDefault
+        underviewHeightConstraint.constant = scrollToTop ? SecondViewController.underviewCollapsedHeight : underviewHeightDefault
         
         UIView.animate(withDuration: 0.25, animations: { [weak self] in
             let strongSelf = self!
@@ -253,3 +253,343 @@ extension SecondViewController : UITableViewDelegate {
         return CGFloat(40)
     }
 }
+
+
+//-----
+
+
+class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitioning {
+    
+    static var transitionNavUnderView: UIView?
+    static var anotherTransitionNavUnderView: UIView?
+    
+    override init() {
+        super.init()
+        
+        if SecondViewControllerAnimator.transitionNavUnderView == nil ||
+            SecondViewControllerAnimator.anotherTransitionNavUnderView == nil {
+            
+            let getView: ((Void) -> UIView) = {
+                let additionalView = UIView()
+                additionalView.clipsToBounds = true
+                
+                let navBar = UINavigationBar()
+                additionalView.addSubview(navBar)
+                
+                navBar.translatesAutoresizingMaskIntoConstraints = false
+                navBar.heightAnchor.constraint(equalToConstant: 2000).isActive = true
+                navBar.topAnchor.constraint(equalTo: additionalView.topAnchor).isActive = true
+                navBar.leftAnchor.constraint(equalTo: additionalView.leftAnchor).isActive = true
+                navBar.rightAnchor.constraint(equalTo: additionalView.rightAnchor).isActive = true
+                
+                let lineView = UIView()
+                lineView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3)
+                
+                additionalView.addSubview(lineView)
+                
+                lineView.translatesAutoresizingMaskIntoConstraints = false
+                lineView.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
+                lineView.bottomAnchor.constraint(equalTo: additionalView.bottomAnchor).isActive = true
+                lineView.leftAnchor.constraint(equalTo: additionalView.leftAnchor).isActive = true
+                lineView.rightAnchor.constraint(equalTo: additionalView.rightAnchor).isActive = true
+                
+                additionalView.layoutIfNeeded()
+                
+                return additionalView
+            }
+            
+            SecondViewControllerAnimator.transitionNavUnderView = getView()
+            SecondViewControllerAnimator.anotherTransitionNavUnderView = getView()
+            
+        }
+        
+    }
+    
+    
+    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return 0.25
+    }
+    
+    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        
+        let duration = self.transitionDuration(using: transitionContext)
+        
+        let containerView = transitionContext.containerView
+        
+        guard let fromVC = transitionContext.viewController(forKey: .from)  as? SecondViewController else { return }
+        guard let toVC = transitionContext.viewController(forKey: .to) else { return }
+        
+        guard let toView = transitionContext.view(forKey: .to) else { return }
+        guard let fromView = transitionContext.view(forKey: .from) else { return }
+        
+        let transitionToNoNavBar = (toVC.navigationController == nil)
+        let transitionToStandardNavBar = !(toVC is SecondViewController)
+        
+        let finalFrameTo : CGRect = transitionContext.finalFrame(for: toVC)
+        let offsetFrame : CGRect = finalFrameTo.offsetBy(dx: UIScreen.main.bounds.width, dy: 0)
+        
+        containerView.insertSubview(toView, belowSubview: fromView)
+        
+        fromView.frame = finalFrameTo
+        toView.frame = finalFrameTo
+        
+        
+        let fromVCHeightConstraint = fromVC.underviewHeightConstraint
+        let fromVCHeightConstraintConst = fromVCHeightConstraint!.constant
+        
+        let fromVCUnderView = fromVC.underView!
+        let fromVCUnderViewHeight = fromVCUnderView.bounds.height
+        
+        let fromVCUnderLabel = fromVC.underLabel!
+        
+        let fromVCScrollView = fromVC.scrollView!
+        let fromVCScrollViewContentOffset = fromVCScrollView.contentOffset.y
+        
+        let transitionNavUnderView = SecondViewControllerAnimator.transitionNavUnderView!
+        transitionNavUnderView.frame = fromVCUnderView.frame
+        transitionNavUnderView.layoutIfNeeded()
+        
+        let underviewCollapsedHeight = SecondViewController.underviewCollapsedHeight
+        
+        // animation to VC without NavigationController
+        let animateToNoNavigationBarViewController = {
+            
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            
+        }
+        
+        // animation to VC with standart NavigationController
+        let animateToStandartNavigationBarViewController = { (collapsed: Bool) -> Void in
+            
+            toView.addSubview(transitionNavUnderView)
+            
+            fromVCHeightConstraint!.constant = underviewCollapsedHeight
+            
+            let toNavVCScrollView: UIScrollView? = collapsed ? (toVC as! SecondViewController).scrollView : nil
+            let toNavVCScrollViewOffset: CGFloat? = collapsed ? toNavVCScrollView!.contentOffset.y : nil
+            if collapsed {
+                let transitionNavUnderViewHeight = transitionNavUnderView.frame.height
+                toNavVCScrollView!.contentOffset.y -= (transitionNavUnderViewHeight <= underviewCollapsedHeight) ? 0.0 : transitionNavUnderViewHeight
+            }
+            
+            transitionNavUnderView.layoutIfNeeded()
+            
+            UIView.animate(withDuration: duration, animations: {
+                
+                toView.frame = finalFrameTo
+                fromView.frame = offsetFrame
+                
+                fromVCScrollView.contentOffset.y = fromVCScrollViewContentOffset + fromVCUnderViewHeight
+                
+                transitionNavUnderView.frame.size.height = underviewCollapsedHeight
+                transitionNavUnderView.layoutIfNeeded()
+                
+                fromView.layoutIfNeeded()
+                
+                if let toNavVCScrollViewOffset = toNavVCScrollViewOffset {
+                    toNavVCScrollView!.contentOffset.y = toNavVCScrollViewOffset
+                }
+                
+            }, completion: { result in
+                transitionNavUnderView.removeFromSuperview()
+                
+                if let navBar = toVC.navigationController?.navigationBar, !collapsed {
+                    navBar.setHideShadowView(false)
+                }
+                
+                fromVCHeightConstraint!.constant = fromVCHeightConstraintConst
+                
+                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            })
+            
+        }
+        
+        
+        // animation to VC with SecondViewController NavigationController
+        let animateToCustomNavigationBarViewController = {
+            
+            let toNavVC = toVC as! SecondViewController
+            
+            let toNavVCHeightConstraint = toNavVC.underviewHeightConstraint
+            let toNavVCHeightConstraintConst = toNavVCHeightConstraint!.constant
+            
+            let toNavVCUnderView = toNavVC.underView!
+            let toNavVCUnderViewHeight = toNavVCUnderView.bounds.height
+            let toNavVCUnderLabel = toNavVC.underLabel!
+            
+            let toNavVCScrollView = toNavVC.scrollView!
+            
+            if toNavVCUnderViewHeight <= underviewCollapsedHeight {
+                animateToStandartNavigationBarViewController(true)
+                return
+            }
+            
+            let fromVCUnderviewDefaultHeight = fromVC.underviewHeightDefault!
+            let toNavVCUnderviewDefaultHeight = toNavVC.underviewHeightDefault!
+            
+            if (fromVCUnderviewDefaultHeight > toNavVCUnderviewDefaultHeight) {
+                // 1
+                print("last transition #1, fromVCUnderview is small = \(fromVCUnderView.bounds.height == underviewCollapsedHeight)")
+                
+                // fromView preparation
+                fromVCHeightConstraint!.constant = toNavVCUnderViewHeight
+                fromVC.underLabel.isHidden = (fromVCUnderViewHeight == underviewCollapsedHeight)
+                
+                let fromVCCurrentContentOffset = fromVCScrollView.contentOffset.y
+                let fromVCContentOffsetDiff = toNavVCUnderViewHeight - fromVCUnderViewHeight
+                
+                // toView preparation
+                toView.addSubview(transitionNavUnderView)
+                
+                let labelSnapshot = toNavVCUnderLabel.snapshotView(afterScreenUpdates: true)!
+                labelSnapshot.frame = toNavVCUnderLabel.frame
+                transitionNavUnderView.addSubview(labelSnapshot)
+                transitionNavUnderView.layoutIfNeeded()
+                
+                let defaultXCoordinate = transitionNavUnderView.center.x
+                transitionNavUnderView.center.x -= toView.bounds.width
+                
+                toNavVCUnderView.isHidden = true
+                
+                let toVCCurrentContentOffset = toNavVCScrollView.contentOffset.y
+                let toVCContentOffsetDiff = toNavVCUnderViewHeight - fromVCUnderViewHeight
+                toNavVCScrollView.contentOffset.y += toVCContentOffsetDiff
+                
+                UIView.animate(withDuration: duration, animations: {
+                    
+                    toView.frame = finalFrameTo
+                    fromView.frame = offsetFrame
+                    
+                    // fromView animation
+                    fromVCScrollView.contentOffset.y -= fromVCContentOffsetDiff
+                    fromView.layoutIfNeeded()
+                    
+                    // toView animation
+                    
+                    transitionNavUnderView.center.x = defaultXCoordinate
+                    transitionNavUnderView.frame.size.height = toNavVC.underviewHeightDefault!
+                    transitionNavUnderView.layoutIfNeeded()
+                    
+                    toNavVCScrollView.contentOffset.y -= toVCContentOffsetDiff
+                    
+                }, completion: { result in
+                    // fromView restoration
+                    fromVCScrollView.contentOffset.y = fromVCCurrentContentOffset
+                    fromVC.underLabel.isHidden = false
+                    fromVCHeightConstraint!.constant = fromVCHeightConstraintConst
+                    
+                    // toView restoration
+                    toNavVCUnderView.isHidden = false
+                    labelSnapshot.removeFromSuperview()
+                    transitionNavUnderView.removeFromSuperview()
+                    
+                    toNavVCScrollView.contentOffset.y = toVCCurrentContentOffset
+                    //
+                    
+                    
+                    transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+                })
+                
+                
+            } else {
+                // 2
+                print("last transition #2, fromVCUnderview is small = \(fromVCUnderView.bounds.height == underviewCollapsedHeight)")
+                // fromView preparation
+                fromView.addSubview(transitionNavUnderView)
+                
+                let labelSnapshot = fromVCUnderLabel.snapshotView(afterScreenUpdates: false)!
+                labelSnapshot.frame = fromVCUnderLabel.frame
+                transitionNavUnderView.addSubview(labelSnapshot)
+                
+                let fromVCCurrentContentOffset = fromVCScrollView.contentOffset.y
+                let fromVCContentOffsetDiff = toNavVCUnderViewHeight - fromVCUnderViewHeight
+                
+                if fromVCUnderViewHeight <= underviewCollapsedHeight {
+                    fromVCUnderLabel.isHidden = true
+                }
+                
+                if fromVCUnderViewHeight <= underviewCollapsedHeight {
+                    labelSnapshot.isHidden = true
+                }
+                
+                // toView preparation
+                let anotherTransitionNavUnderView = SecondViewControllerAnimator.anotherTransitionNavUnderView!
+                anotherTransitionNavUnderView.frame = transitionNavUnderView.frame
+                anotherTransitionNavUnderView.layoutIfNeeded()
+                toView.addSubview(anotherTransitionNavUnderView)
+                
+                let labelSnapshot2 = toNavVCUnderLabel.snapshotView(afterScreenUpdates: true)!
+                labelSnapshot2.frame = toNavVCUnderLabel.frame
+                anotherTransitionNavUnderView.addSubview(labelSnapshot2)
+                
+                toNavVCUnderView.isHidden = true
+                
+                let toVCCurrentContentOffset = toNavVCScrollView.contentOffset.y
+                let toVCContentOffsetDiff = toNavVCUnderViewHeight - fromVCUnderViewHeight
+                toNavVCScrollView.contentOffset.y += toVCContentOffsetDiff
+                
+                let toVCUnderLabelCenterX = anotherTransitionNavUnderView.center.x
+                anotherTransitionNavUnderView.center.x -= toView.bounds.width
+                
+                transitionNavUnderView.layoutIfNeeded()
+                anotherTransitionNavUnderView.layoutIfNeeded()
+                
+                UIView.animate(withDuration: duration, animations: {
+                    
+                    toView.frame = finalFrameTo
+                    fromView.frame = offsetFrame
+                    
+                    // fromView animation
+                    transitionNavUnderView.frame.size.height = toNavVCUnderViewHeight
+                    transitionNavUnderView.layoutIfNeeded()
+                    
+                    fromVCScrollView.contentOffset.y -= fromVCContentOffsetDiff
+                    
+                    fromVCUnderLabel.isHidden = false
+                    
+                    // toView animation
+                    anotherTransitionNavUnderView.center.x = toVCUnderLabelCenterX
+                    anotherTransitionNavUnderView.frame.size.height = toNavVCUnderView.bounds.height
+                    anotherTransitionNavUnderView.layoutIfNeeded()
+                    
+                    toNavVCScrollView.contentOffset.y = toVCCurrentContentOffset
+                    
+                    
+                }, completion: { result in
+                    // fromView restoration
+                    fromVCUnderView.isHidden = false
+                    
+                    labelSnapshot.removeFromSuperview()
+                    transitionNavUnderView.removeFromSuperview()
+                    
+                    fromVCScrollView.contentOffset.y = fromVCCurrentContentOffset
+                    
+                    // toView restoration
+                    toNavVCUnderView.isHidden = false
+                    toNavVCScrollView.contentOffset.y = toVCCurrentContentOffset
+                    
+                    labelSnapshot2.removeFromSuperview()
+                    anotherTransitionNavUnderView.removeFromSuperview()
+                    
+                    transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+                })
+            }
+            
+        }
+        
+        
+        if transitionToNoNavBar {
+            animateToNoNavigationBarViewController()
+        } else {
+            if transitionToStandardNavBar {
+                animateToStandartNavigationBarViewController(false)
+            } else {
+                animateToCustomNavigationBarViewController()
+            }
+        }
+    }
+    
+}
+
+
+

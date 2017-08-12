@@ -15,6 +15,7 @@
 		845D2E9D1F3B0C360086B03F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 845D2E9B1F3B0C360086B03F /* LaunchScreen.storyboard */; };
 		845D2EA51F3B0D200086B03F /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845D2EA41F3B0D200086B03F /* FirstViewController.swift */; };
 		845D2EA71F3B0D2E0086B03F /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845D2EA61F3B0D2E0086B03F /* SecondViewController.swift */; };
+		E64B4C051F3F89EC00F454B9 /* B32UnderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64B4C041F3F89EC00F454B9 /* B32UnderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		845D2E9E1F3B0C360086B03F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		845D2EA41F3B0D200086B03F /* FirstViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
 		845D2EA61F3B0D2E0086B03F /* SecondViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
+		E64B4C041F3F89EC00F454B9 /* B32UnderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = B32UnderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +86,7 @@
 			children = (
 				845D2E921F3B0C360086B03F /* AppDelegate.swift */,
 				845D2E961F3B0C360086B03F /* Main.storyboard */,
+				E64B4C041F3F89EC00F454B9 /* B32UnderView.swift */,
 				845D2EA41F3B0D200086B03F /* FirstViewController.swift */,
 				845D2EA61F3B0D2E0086B03F /* SecondViewController.swift */,
 				841CABAD1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift */,
@@ -218,6 +221,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E64B4C051F3F89EC00F454B9 /* B32UnderView.swift in Sources */,
 				845D2EA71F3B0D2E0086B03F /* SecondViewController.swift in Sources */,
 				841CABAE1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift in Sources */,
 				845D2EA51F3B0D200086B03F /* FirstViewController.swift in Sources */,
