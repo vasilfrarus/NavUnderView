@@ -44,7 +44,9 @@ class SecondViewController: UIViewController {
         navigationController?.view.backgroundColor = UIColor.white
         
         installGestureRecognizer()
+
         createUnderView()
+        underView.barTintColor = navigationController?.navigationBar.barTintColor
         
         scrollUnderView.delegate = self
         (scrollUnderView as! UITableView).dataSource = self
@@ -137,7 +139,7 @@ class SecondViewController: UIViewController {
         
         underviewHeightConstraint = underView.heightAnchor.constraint(lessThanOrEqualToConstant: underviewHeightConstraintConstantDefault)
         
-        underView.label.numberOfLines = 5
+        underView.label.numberOfLines = 4
         
         underviewHeightConstraint.isActive = true
     }
@@ -264,8 +266,8 @@ extension SecondViewController : UITableViewDelegate {
 
 class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitioning {
     
-    static var transitionNavUnderView: UIView?
-    static var anotherTransitionNavUnderView: UIView?
+    static var transitionNavUnderView: B32UnderView?
+    static var anotherTransitionNavUnderView: B32UnderView?
     
     override init() {
         super.init()
@@ -336,6 +338,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
         let animateToStandartNavigationBarViewController = { (collapsed: Bool) -> Void in
             
             toView.addSubview(transitionNavUnderView)
+            transitionNavUnderView.barTintColor = toVC.navigationController?.navigationBar.barTintColor
             
             fromVCHeightConstraint!.constant = underviewCollapsedHeight
             
@@ -417,6 +420,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 
                 // toView preparation
                 toView.addSubview(transitionNavUnderView)
+                transitionNavUnderView.barTintColor = toVC.navigationController?.navigationBar.barTintColor
                 
                 let labelSnapshot = toNavVCUnderLabel.snapshotView(afterScreenUpdates: true)!
                 labelSnapshot.frame = toNavVCUnderLabel.frame
@@ -481,6 +485,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 print("last transition #2, fromVCUnderview is small = \(fromVCUnderView.bounds.height == underviewCollapsedHeight)")
                 // fromView preparation
                 fromView.addSubview(transitionNavUnderView)
+                transitionNavUnderView.barTintColor = fromVC.navigationController?.navigationBar.barTintColor
                 
                 let labelSnapshot = fromVCUnderLabel.snapshotView(afterScreenUpdates: false)!
                 labelSnapshot.frame = fromVCUnderLabel.frame
@@ -502,6 +507,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 anotherTransitionNavUnderView.frame = transitionNavUnderView.frame
                 anotherTransitionNavUnderView.layoutIfNeeded()
                 toView.addSubview(anotherTransitionNavUnderView)
+                anotherTransitionNavUnderView.barTintColor = toVC.navigationController?.navigationBar.barTintColor
                 
                 let labelSnapshot2 = toNavVCUnderLabel.snapshotView(afterScreenUpdates: true)!
                 labelSnapshot2.frame = toNavVCUnderLabel.frame
