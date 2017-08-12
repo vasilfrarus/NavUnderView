@@ -267,8 +267,6 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 // fromView preparation
                 fromView.addSubview(transitionNavUnderView)
 
-                fromVCUnderView.isHidden = true
-                
                 let labelSnapshot = fromVCUnderLabel.snapshotView(afterScreenUpdates: false)!
                 labelSnapshot.frame = fromVCUnderLabel.frame
                 transitionNavUnderView.addSubview(labelSnapshot)
@@ -338,7 +336,8 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
 
                     // toView restoration
                     toNavVCUnderView.isHidden = false
-
+                    toNavVCScrollView.contentOffset.y = toVCCurrentContentOffset
+                    
                     labelSnapshot2.removeFromSuperview()
                     anotherTransitionNavUnderView.removeFromSuperview()
                     
