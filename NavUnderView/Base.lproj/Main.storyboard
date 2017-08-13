@@ -26,7 +26,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="40"/>
                                 <state key="normal" title="Button"/>
                                 <connections>
-                                    <segue destination="K5O-Dr-Hkg" kind="show" id="oIY-gr-FXm"/>
+                                    <action selector="buttonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="S2i-0D-LXm"/>
                                 </connections>
                             </button>
                         </subviews>
