@@ -42,13 +42,19 @@ class B32UnderView: UIView {
         _labelView = UILabel()
         addSubview(_labelView)
 
+        let topLabelInset: CGFloat = 10.0
+        let bottomLabelInset: CGFloat = topLabelInset
+        let leftLabelInset: CGFloat = 30.0
+        let rightLabelInset: CGFloat = leftLabelInset
+        
         _labelView.translatesAutoresizingMaskIntoConstraints = false
-        _labelView.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-        let bottomConstraint = _labelView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10)
+        _labelView.topAnchor.constraint(equalTo: topAnchor, constant: topLabelInset).isActive = true
+        let bottomConstraint = _labelView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -1.0*bottomLabelInset)
         bottomConstraint.priority = 1
         bottomConstraint.isActive = true
-        _labelView.leftAnchor.constraint(equalTo: leftAnchor, constant: 30).isActive = true
-        _labelView.rightAnchor.constraint(equalTo: rightAnchor, constant: -30).isActive = true
+        _labelView.leftAnchor.constraint(equalTo: leftAnchor, constant: leftLabelInset).isActive = true
+        _labelView.rightAnchor.constraint(equalTo: rightAnchor, constant: -1.0*rightLabelInset).isActive = true
+        
         
         _lineView = UIView()
         _lineView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3)
