@@ -183,6 +183,8 @@ class SecondViewController: UIViewController {
         } else if orientationChanged {
 
             orientationChanged = false
+
+            view.layoutIfNeeded()
             
             let oldUnderviewHeightDefault = underviewHeightDefault!
             let oldScrollViewInsetDefault = scrollViewInsetDefault!
@@ -498,6 +500,9 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
         
         // animation to VC with SecondViewController NavigationController
         let animateToCustomNavigationBarViewController = {
+
+            toView.layoutIfNeeded()
+            fromView.layoutIfNeeded()
             
             let toNavVC = toVC as! SecondViewController
             
@@ -514,9 +519,11 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 animateToStandartNavigationBarViewController(true)
                 return
             }
-            
+
             let fromVCUnderviewDefaultHeight: CGFloat = fromVC.underviewHeightDefault
             let toNavVCUnderviewDefaultHeight: CGFloat = toNavVC.underviewHeightDefault!
+            
+            print("fromVCUnderviewDefaultHeight: \(fromVCUnderviewDefaultHeight), toNavVCUnderviewDefaultHeight: \(toNavVCUnderviewDefaultHeight)")
             
             if (fromVCUnderviewDefaultHeight > toNavVCUnderviewDefaultHeight) {
                 // 1
@@ -563,7 +570,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     // toView animation
                     
                     transitionNavUnderView.center.x = defaultXCoordinate
-                    transitionNavUnderView.frame.size.height = toNavVC.underviewHeightDefault
+                    transitionNavUnderView.frame.size.height = toNavVCUnderView.bounds.height
                     transitionNavUnderView.layoutIfNeeded()
                     
                     toNavVCScrollView.contentOffset.y -= toVCContentOffsetDiff
