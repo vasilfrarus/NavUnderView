@@ -7,5 +7,6 @@ target 'NavUnderView' do
 
   # Pods for NavUnderView
   pod 'LoremIpsum', '~> 1.0'
+  pod 'GradientView'
   
 end

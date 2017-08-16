@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LoremIpsum
 
 class FirstViewController: UIViewController, UINavigationControllerDelegate {
 
@@ -25,6 +26,14 @@ class FirstViewController: UIViewController, UINavigationControllerDelegate {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    @IBAction func buttonTapped(_ sender: Any) {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let newVC = (storyboard.instantiateViewController(withIdentifier: "SecondVC") as! SecondViewController)
+        newVC.underLabelText = LoremIpsum.words(withNumber: Int(arc4random_uniform(15)) + 3)
+        self.navigationController?.pushViewController(newVC, animated: true)
+        
     }
 
 }
