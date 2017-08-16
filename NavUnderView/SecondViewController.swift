@@ -424,6 +424,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
             
             toView.addSubview(transitionNavUnderView)
             transitionNavUnderView.barTintColor = toVC.navigationController?.navigationBar.barTintColor
+            let transitionNavUnderViewHeightBefore = transitionNavUnderView.frame.size.height
             
             fromVCHeightConstraint!.constant = underviewCollapsedHeight
             
@@ -443,7 +444,9 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 
                 fromVCScrollView.contentOffset.y = fromVCScrollViewContentOffset + fromVCUnderViewHeight
                 
-                transitionNavUnderView.frame.size.height = underviewCollapsedHeight
+
+                transitionNavUnderView.bounds.size.height = underviewCollapsedHeight
+                transitionNavUnderView.center.y += (underviewCollapsedHeight - transitionNavUnderViewHeightBefore)/2.0
                 transitionNavUnderView.layoutIfNeeded()
                 
                 fromVCUnderLabel.alpha = 0
@@ -515,6 +518,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 
                 let defaultXCoordinate = transitionNavUnderView.center.x
                 transitionNavUnderView.center.x -= toView.bounds.width
+                let transitionNavUnderViewHeightBefore = transitionNavUnderView.bounds.size.height
                 
                 toNavVCUnderView.isHidden = true
                 
@@ -536,8 +540,9 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     
                     // toView animation
                     
-                    transitionNavUnderView.center.x = defaultXCoordinate
-                    transitionNavUnderView.frame.size.height = toNavVCUnderView.bounds.height
+                    let newCenter = CGPoint(x: defaultXCoordinate, y: transitionNavUnderView.center.y + (toNavVCUnderView.bounds.height - transitionNavUnderViewHeightBefore)/2.0)
+                    transitionNavUnderView.bounds.size.height = toNavVCUnderView.bounds.height
+                    transitionNavUnderView.center = newCenter
                     transitionNavUnderView.layoutIfNeeded()
                     
                     toNavVCScrollView.contentOffset.y -= toVCContentOffsetDiff
@@ -571,6 +576,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 // fromView preparation
                 fromView.addSubview(transitionNavUnderView)
                 transitionNavUnderView.barTintColor = fromVC.navigationController?.navigationBar.barTintColor
+                let transitionNavUnderViewHeightBefore = transitionNavUnderView.bounds.size.height
                 
                 let labelSnapshot = fromVCUnderLabel.snapshotView(afterScreenUpdates: false)!
                 labelSnapshot.frame = fromVCUnderLabel.frame
@@ -593,6 +599,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                 anotherTransitionNavUnderView.layoutIfNeeded()
                 toView.addSubview(anotherTransitionNavUnderView)
                 anotherTransitionNavUnderView.barTintColor = toVC.navigationController?.navigationBar.barTintColor
+                let anotherTransitionNavUnderViewHeightBefore = anotherTransitionNavUnderView.bounds.size.height
                 
                 let labelSnapshot2 = toNavVCUnderLabel.snapshotView(afterScreenUpdates: true)!
                 labelSnapshot2.frame = toNavVCUnderLabel.frame
@@ -617,7 +624,9 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     fromView.frame = offsetFrame
                     
                     // fromView animation
-                    transitionNavUnderView.frame.size.height = toNavVCUnderViewHeight
+                    let newCenter = CGPoint(x: transitionNavUnderView.center.x, y: transitionNavUnderView.center.y + (toNavVCUnderViewHeight - transitionNavUnderViewHeightBefore)/2.0)
+                    transitionNavUnderView.bounds.size.height = toNavVCUnderViewHeight
+                    transitionNavUnderView.center = newCenter
                     transitionNavUnderView.layoutIfNeeded()
                     
                     fromVCScrollView.contentOffset.y -= fromVCContentOffsetDiff
@@ -626,8 +635,9 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
                     labelSnapshot.alpha = 0
                     
                     // toView animation
-                    anotherTransitionNavUnderView.center.x = toVCUnderLabelCenterX
-                    anotherTransitionNavUnderView.frame.size.height = toNavVCUnderView.bounds.height
+                    let anotherNewCenter = CGPoint(x: toVCUnderLabelCenterX, y: anotherTransitionNavUnderView.center.y + (toNavVCUnderView.bounds.height - anotherTransitionNavUnderViewHeightBefore)/2.0)
+                    anotherTransitionNavUnderView.bounds.size.height = toNavVCUnderView.bounds.height
+                    anotherTransitionNavUnderView.center = anotherNewCenter
                     anotherTransitionNavUnderView.layoutIfNeeded()
                     
                     toNavVCScrollView.contentOffset.y = toVCCurrentContentOffset
