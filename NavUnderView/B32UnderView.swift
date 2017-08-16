@@ -48,10 +48,14 @@ class B32UnderView: UIView {
         let rightLabelInset: CGFloat = leftLabelInset
         
         _labelView.translatesAutoresizingMaskIntoConstraints = false
-        _labelView.topAnchor.constraint(equalTo: topAnchor, constant: topLabelInset).isActive = true
+        let topConstraint = _labelView.topAnchor.constraint(equalTo: topAnchor, constant: topLabelInset)
+        topConstraint.priority = 1
+        topConstraint.isActive = true
+
         let bottomConstraint = _labelView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -1.0*bottomLabelInset)
-        bottomConstraint.priority = 1
+//        bottomConstraint.priority = 1
         bottomConstraint.isActive = true
+        
         _labelView.leftAnchor.constraint(equalTo: leftAnchor, constant: leftLabelInset).isActive = true
         _labelView.rightAnchor.constraint(equalTo: rightAnchor, constant: -1.0*rightLabelInset).isActive = true
         
