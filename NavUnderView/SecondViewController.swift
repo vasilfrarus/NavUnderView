@@ -23,7 +23,7 @@ class SecondViewController: UIViewController {
     }
     
     fileprivate var underView: B32UnderView!
-    private var orientationChanged: Bool = true
+    private var orientationChanged: Bool = false
     private var firstAppearance: Bool = true
     
     fileprivate var underviewHeightConstraint: NSLayoutConstraint!
@@ -105,46 +105,11 @@ class SecondViewController: UIViewController {
         
         if (isViewLoaded && view.window != nil) {
             print("Rotated visible")
-            // only if VC is visible now
-
-            orientationChanged = false
             
-            let oldUnderviewHeightDefault = underviewHeightDefault!
-            let oldScrollViewInsetDefault = scrollViewInsetDefault!
-            let oldScrollViewOffset = scrollUnderView.contentOffset.y
-            
-            view.layoutIfNeeded()
-            let underViewHeight = underView.frame.height
-            let standartNavigationBarHeight = getStandartNavigationBarHeight()
-            
-            underviewHeightDefault = underViewHeight
-            scrollViewInsetDefault = standartNavigationBarHeight + underviewHeightDefault
-            
-            let edgeInsets = UIEdgeInsetsMake(scrollViewInsetDefault, 0, 0, 0)
-            
-            scrollUnderView.contentInset = edgeInsets
-            scrollUnderView.scrollIndicatorInsets = edgeInsets
-            
-            let oldStandartNavigationBarHeight = oldScrollViewInsetDefault - oldUnderviewHeightDefault
-            
-            let standartNavigationBarDiff = oldStandartNavigationBarHeight - standartNavigationBarHeight
-            let underviewHeightDiff = oldUnderviewHeightDefault - underviewHeightDefault
-            let navBarDiff = (standartNavigationBarDiff + underviewHeightDiff)
-            
-            if (oldScrollViewInsetDefault != -1.0 * oldScrollViewOffset)
-            {
-                let additional = oldStandartNavigationBarHeight + oldScrollViewOffset
-                scrollUnderView.contentOffset.y = (-1 * standartNavigationBarHeight + additional)
-                
-            } else {
-                scrollUnderView.contentOffset.y = (-1 * scrollViewInsetDefault)
-            }
-            
-            scrollViewDidScroll(scrollUnderView)
+            recalcUnderViewPropertiesIfOrientationChanged()
             
         } else {
             print("Rotated invisible")
-            view.layoutIfNeeded()
         }
         
     }
@@ -162,8 +127,6 @@ class SecondViewController: UIViewController {
         
         navigationController?.navigationBar.setHideShadowView(true)
         
-        guard firstAppearance || orientationChanged else { return }
-        
         if firstAppearance {
             firstAppearance = false
 
@@ -180,45 +143,48 @@ class SecondViewController: UIViewController {
             
             scrollUnderView.setContentOffset(CGPoint(x: 0, y: -1.0 * scrollViewInsetDefault), animated: false)
             
-        } else if orientationChanged {
-
-            orientationChanged = false
-
-            view.layoutIfNeeded()
-            
-            let oldUnderviewHeightDefault = underviewHeightDefault!
-            let oldScrollViewInsetDefault = scrollViewInsetDefault!
-            let oldScrollViewOffset = scrollUnderView.contentOffset.y
-            
-            let underViewHeight = underView.frame.height
-            let standartNavigationBarHeight = getStandartNavigationBarHeight()
-            
-            underviewHeightDefault = underViewHeight
-            scrollViewInsetDefault = standartNavigationBarHeight + underviewHeightDefault
-            
-            let edgeInsets = UIEdgeInsetsMake(scrollViewInsetDefault, 0, 0, 0)
-            
-            scrollUnderView.contentInset = edgeInsets
-            scrollUnderView.scrollIndicatorInsets = edgeInsets
-            
-            let oldStandartNavigationBarHeight = oldScrollViewInsetDefault - oldUnderviewHeightDefault
-            
-            let standartNavigationBarDiff = oldStandartNavigationBarHeight - standartNavigationBarHeight
-            let underviewHeightDiff = oldUnderviewHeightDefault - underviewHeightDefault
-            let navBarDiff = (standartNavigationBarDiff + underviewHeightDiff)
-            
-            if (oldScrollViewInsetDefault != -1.0 * oldScrollViewOffset)
-            {
-                let additional = oldStandartNavigationBarHeight + oldScrollViewOffset
-                scrollUnderView.contentOffset.y = (-1 * standartNavigationBarHeight + additional)
-                
-            } else {
-                scrollUnderView.contentOffset.y = (-1 * scrollViewInsetDefault)
-            }
-            
-            scrollViewDidScroll(scrollUnderView)
-            
         }
+    }
+    
+    func recalcUnderViewPropertiesIfOrientationChanged() {
+        
+        guard orientationChanged else { return }
+        
+        orientationChanged = false
+
+        let oldUnderviewHeightDefault = underviewHeightDefault!
+        let oldScrollViewInsetDefault = scrollViewInsetDefault!
+        let oldScrollViewOffset = scrollUnderView.contentOffset.y
+        
+        view.layoutIfNeeded()
+        
+        let underViewHeight = underView.frame.height
+        let standartNavigationBarHeight = getStandartNavigationBarHeight()
+        
+        underviewHeightDefault = underViewHeight
+        scrollViewInsetDefault = standartNavigationBarHeight + underviewHeightDefault
+        
+        let edgeInsets = UIEdgeInsetsMake(scrollViewInsetDefault, 0, 0, 0)
+        
+        scrollUnderView.contentInset = edgeInsets
+        scrollUnderView.scrollIndicatorInsets = edgeInsets
+        
+        let oldStandartNavigationBarHeight = oldScrollViewInsetDefault - oldUnderviewHeightDefault
+        
+        let standartNavigationBarDiff = oldStandartNavigationBarHeight - standartNavigationBarHeight
+        let underviewHeightDiff = oldUnderviewHeightDefault - underviewHeightDefault
+        let navBarDiff = (standartNavigationBarDiff + underviewHeightDiff)
+        
+        if (oldScrollViewInsetDefault != -1.0 * oldScrollViewOffset)
+        {
+            let additional = oldStandartNavigationBarHeight + oldScrollViewOffset
+            scrollUnderView.contentOffset.y = (-1 * standartNavigationBarHeight + additional)
+            
+        } else {
+            scrollUnderView.contentOffset.y = (-1 * scrollViewInsetDefault)
+        }
+        
+        recalcUnderviewHeightConstraint()
     }
     
     func installGestureRecognizer() {
@@ -323,23 +289,27 @@ extension SecondViewController : UINavigationControllerDelegate {
 }
 
 extension SecondViewController : UIScrollViewDelegate {
-
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard !SecondViewController.transitionIsOn else { return } // do not work at transition
-        
-        let statusBarHeight = UIApplication.shared.isStatusBarHidden ? 0 : UIApplication.shared.statusBarFrame.height
-        
-        let navStatusHeight = statusBarHeight + (navigationController?.navigationBar.bounds.height ?? 0)
+    
+    func recalcUnderviewHeightConstraint() {
+        let navStatusHeight = getStandartNavigationBarHeight()
         
         let yoffset = scrollView.contentOffset.y + navStatusHeight
         
         underviewHeightConstraint.constant = (yoffset >= 0.0) ? SecondViewController.underviewCollapsedHeight : abs(yoffset)
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard !SecondViewController.transitionIsOn else { return } // do not work at transition
+        
+        recalcUnderviewHeightConstraint()
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard !SecondViewController.transitionIsOn else { return } // do not work at transition
         rewindScrollView(animated: true)
     }
+    
+    
 
 }
 
@@ -449,6 +419,8 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
         
         // animation to VC with standart NavigationController
         let animateToStandartNavigationBarViewController = { (collapsed: Bool) -> Void in
+
+            print("last transition to Standart \(collapsed ? "Collapsed" : ""), fromVCUnderview is small = \(fromVCUnderView.bounds.height == underviewCollapsedHeight)")
             
             toView.addSubview(transitionNavUnderView)
             transitionNavUnderView.barTintColor = toVC.navigationController?.navigationBar.barTintColor
@@ -501,13 +473,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
         // animation to VC with SecondViewController NavigationController
         let animateToCustomNavigationBarViewController = {
 
-            toView.layoutIfNeeded()
-            fromView.layoutIfNeeded()
-            
             let toNavVC = toVC as! SecondViewController
-            
-            let toNavVCHeightConstraint = toNavVC.underviewHeightConstraint
-            let toNavVCHeightConstraintConst = toNavVCHeightConstraint!.constant
             
             let toNavVCUnderView = toNavVC.underView!
             let toNavVCUnderViewHeight = toNavVCUnderView.bounds.height
@@ -515,6 +481,7 @@ class SecondViewControllerAnimator : NSObject, UIViewControllerAnimatedTransitio
             
             let toNavVCScrollView = toNavVC.scrollUnderView!
             
+            toNavVC.recalcUnderViewPropertiesIfOrientationChanged()
             if toNavVCUnderViewHeight <= underviewCollapsedHeight {
                 animateToStandartNavigationBarViewController(true)
                 return
