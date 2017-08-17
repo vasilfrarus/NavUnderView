@@ -10,8 +10,29 @@ import Foundation
 import UIKit
 
 extension UINavigationBar {
+
+    private func findTitleLabel(under view: UIView) -> UILabel? {
+        
+        if view is UILabel, let superview = view.superview, NSStringFromClass(type(of: superview)) == "UINavigationItemView" {
+            return (view as! UILabel)
+        }
+        
+        for subview in view.subviews {
+            if let label = findTitleLabel(under: subview) {
+                return label
+            }
+        }
+        
+        return nil
+    }
     
-    func findShadowImage(under view: UIView) -> UIImageView? {
+    
+    func getTitleLabel() -> UILabel? {
+        return findTitleLabel(under: self)
+    }
+    
+    
+    private func findShadowImage(under view: UIView) -> UIImageView? {
         
         if view is UIImageView && view.bounds.size.height <= 3 {
             return (view as! UIImageView)

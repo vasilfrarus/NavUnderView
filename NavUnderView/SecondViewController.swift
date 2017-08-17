@@ -9,6 +9,15 @@
 import UIKit
 import LoremIpsum
 
+
+fileprivate let navItemPlaceHolder = "   "
+
+fileprivate enum B32UnderviewStatus {
+    case hidden
+    case shownPartially
+    case shownFully
+}
+
 class SecondViewController: UIViewController {
 
     fileprivate static var transitionIsOn: Bool = false
@@ -25,6 +34,8 @@ class SecondViewController: UIViewController {
     fileprivate var underView: B32UnderView!
     private var orientationChanged: Bool = false
     private var firstAppearance: Bool = true
+
+    fileprivate var underviewWasCollapsed: Bool = false
     
     fileprivate var underviewHeightConstraint: NSLayoutConstraint!
     fileprivate static let underviewCollapsedHeight: CGFloat = 0.5
@@ -74,15 +85,6 @@ class SecondViewController: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -150,6 +152,8 @@ class SecondViewController: UIViewController {
         
         guard orientationChanged else { return }
         
+        scrollUnderView.delegate = nil
+        
         orientationChanged = false
 
         let oldUnderviewHeightDefault = underviewHeightDefault!
@@ -185,6 +189,8 @@ class SecondViewController: UIViewController {
         }
         
         recalcUnderviewHeightConstraint()
+        
+        scrollUnderView.delegate = self
     }
     
     func installGestureRecognizer() {
@@ -290,7 +296,61 @@ extension SecondViewController : UINavigationControllerDelegate {
 
 extension SecondViewController : UIScrollViewDelegate {
     
-    func recalcUnderviewHeightConstraint() {
+    fileprivate func getUnderviewStatus() -> B32UnderviewStatus {
+        let underviewHeight = underView.bounds.height
+        
+        if underviewHeight <= SecondViewController.underviewCollapsedHeight {
+            return .hidden
+        } else if underviewHeight >= underviewHeightDefault {
+            return .shownFully
+        }
+        
+        return .shownPartially
+        
+    }
+    
+    fileprivate func setTitleBarShown(_ shown: Bool, animated: Bool = true) {
+
+        navigationItem.title = underLabel.text ?? navItemPlaceHolder
+        
+        if let label = navigationController?.navigationBar.getTitleLabel() {
+            
+            label.clipsToBounds = true
+            
+            let from = CGFloat(shown ? 0 : 1)
+            let to = CGFloat(shown ? 1 : 0)
+            
+            if animated {
+                label.alpha = from
+                UIView.animate(withDuration: shown ? 0.5 : 0.125 , animations: {
+                    label.alpha = to
+                }, completion: { res in
+                    label.alpha = to
+                })
+            } else {
+                label.alpha = to
+            }
+        }
+    }
+    
+    fileprivate func refreshNavigationBarTitle(animated: Bool = true) {
+        
+        let underviewStatus = getUnderviewStatus()
+        
+        if underviewStatus == .hidden && !underviewWasCollapsed {
+            // was hidden now
+            underviewWasCollapsed = true
+            setTitleBarShown(true, animated: animated)
+            
+        } else if underviewStatus == .shownFully && underviewWasCollapsed {
+            // was shown now
+            underviewWasCollapsed = false
+            setTitleBarShown(false, animated: animated)
+            
+        }
+    }
+    
+    fileprivate func recalcUnderviewHeightConstraint() {
         let navStatusHeight = getStandartNavigationBarHeight()
         
         let yoffset = scrollView.contentOffset.y + navStatusHeight
@@ -302,6 +362,8 @@ extension SecondViewController : UIScrollViewDelegate {
         guard !SecondViewController.transitionIsOn else { return } // do not work at transition
         
         recalcUnderviewHeightConstraint()
+        
+        refreshNavigationBarTitle()
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
