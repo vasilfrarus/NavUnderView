@@ -35,7 +35,7 @@ class SecondViewController: UIViewController {
     private var orientationChanged: Bool = false
     private var firstAppearance: Bool = true
 
-    fileprivate var underviewWasCollapsed: Bool = false
+    fileprivate var underviewLastStatus: B32UnderviewStatus = .shownFully
     
     fileprivate var underviewHeightConstraint: NSLayoutConstraint!
     fileprivate static let underviewCollapsedHeight: CGFloat = 0.5
@@ -43,6 +43,9 @@ class SecondViewController: UIViewController {
     fileprivate var underviewHeightDefault: CGFloat!
     fileprivate var scrollViewInsetDefault: CGFloat!
     
+    fileprivate var underlabelCopy: UILabel?
+    fileprivate var underlabelShrinkedCopy: UILabel?
+
     fileprivate var underLabel: UILabel! {
         return underView.label
     }
@@ -50,7 +53,6 @@ class SecondViewController: UIViewController {
     public var underLabelText: String?
     
     fileprivate static let animator = SecondViewControllerAnimator()
-    
     
     var cellColor: [Int] = []
     var cellHeight: [CGFloat] = []
@@ -69,7 +71,11 @@ class SecondViewController: UIViewController {
         }
         underView.layoutIfNeeded()
         
-
+        
+        let navigationBarHeight = navigationController!.navigationBar.bounds.height
+        
+        let titleView = B32TitleView(frame: CGRect(x: 0, y: 0, width: 5000, height: navigationBarHeight))
+        navigationItem.titleView = titleView
         
         scrollUnderView.delegate = self
         (scrollUnderView as! UITableView).dataSource = self
@@ -275,6 +281,7 @@ class SecondViewController: UIViewController {
         }
     }
     
+    
 }
 
 extension SecondViewController : UINavigationControllerDelegate {
@@ -335,19 +342,160 @@ extension SecondViewController : UIScrollViewDelegate {
     
     fileprivate func refreshNavigationBarTitle(animated: Bool = true) {
         
+        
+        
         let underviewStatus = getUnderviewStatus()
         
-        if underviewStatus == .hidden && !underviewWasCollapsed {
-            // was hidden now
-            underviewWasCollapsed = true
-            setTitleBarShown(true, animated: animated)
+        let removeViewsFromWindow = { () -> Void in
+            self.underlabelCopy?.removeFromSuperview()
+            self.underlabelCopy = nil
             
-        } else if underviewStatus == .shownFully && underviewWasCollapsed {
-            // was shown now
-            underviewWasCollapsed = false
-            setTitleBarShown(false, animated: animated)
+            self.underlabelShrinkedCopy?.removeFromSuperview()
+            self.underlabelShrinkedCopy = nil
+        }
+        
+        
+        if underviewStatus == .shownPartially && underviewLastStatus == .shownFully {
+            // starts to hide
+            
+            let window = view.window!
+            
+            removeViewsFromWindow()
+            
+            underlabelCopy = UILabel(frame: underLabel.frame)
+            underlabelCopy!.backgroundColor = underLabel.backgroundColor
+            underlabelCopy!.font = underLabel.font
+            underlabelCopy!.text = underLabel.text
+            underlabelCopy!.textColor = UIColor.black // underLabel.textColor
+            underlabelCopy!.numberOfLines = underLabel.numberOfLines
+            
+            let numberOfShrinkedLines = UIDevice.current.orientation.isLandscape ? 1 : 2
+            
+            underlabelShrinkedCopy = UILabel(frame: underLabel.frame)
+            underlabelShrinkedCopy!.backgroundColor = underLabel.backgroundColor
+            underlabelShrinkedCopy!.font = underLabel.font
+            underlabelShrinkedCopy!.text = underLabel.text
+            underlabelShrinkedCopy!.textColor = UIColor.orange
+            underlabelShrinkedCopy!.numberOfLines = numberOfShrinkedLines
+            underlabelShrinkedCopy!.sizeToFit()
+            underlabelShrinkedCopy!.alpha = 0.0
+            
+            let copyFrame = (window as UIView).convert(underLabel.frame, from: underView)
+            underlabelCopy!.frame = copyFrame
+            
+            underlabelShrinkedCopy!.frame.origin.x = copyFrame.origin.x
+            underlabelShrinkedCopy!.frame.origin.y = copyFrame.origin.y
+
+            window.addSubview(underlabelCopy!)
+            window.addSubview(underlabelShrinkedCopy!)
+            
+            underLabel.textColor = UIColor.clear
+            
+        } else if underviewStatus == .shownPartially && underviewLastStatus == .hidden {
+            // starts to show
+            print("starts to show")
+            
+        } else if underviewStatus == .shownFully && underviewLastStatus == .shownPartially {
+            // was shown fully
+            print("was shown fully")
+
+            removeViewsFromWindow()
+            
+            underLabel.textColor = UIColor.black
+            
+        } else if underviewStatus == .hidden && underviewLastStatus == .shownPartially {
+            // was hidden
+            print("was hidden")
+            
+            let windowView: UIView = view.window!
+            let titleView = navigationItem.titleView!
+            
+            let titleViewOriginInWindow = windowView.convert(titleView.bounds.origin, from: titleView)
+            let screenCenterInWindow = view.bounds.width / 2.0
+            
+            let navigationBarHeight = navigationController!.navigationBar.bounds.height
+            
+            let scaleConstant = 14.0/underlabelShrinkedCopy!.font.pointSize
+            
+            let shrinkedCopyBounds = underlabelShrinkedCopy!.bounds
+            let shrinkedCopyScaledBounds = CGRect(origin: shrinkedCopyBounds.origin, size: CGSize(width: shrinkedCopyBounds.width * scaleConstant, height: shrinkedCopyBounds.height * scaleConstant))
+            
+            let shrinkedCopyHalfWidth = shrinkedCopyScaledBounds.width / 2.0
+            let titleViewHalfwidth = screenCenterInWindow - titleViewOriginInWindow.x
+            
+            let shrinkedCopyOriginNewXCoord: CGFloat!
+            if titleViewHalfwidth > shrinkedCopyHalfWidth {
+                shrinkedCopyOriginNewXCoord = screenCenterInWindow - shrinkedCopyHalfWidth
+            } else {
+                shrinkedCopyOriginNewXCoord = titleViewOriginInWindow.x
+            }
+            
+            let yDelta = (navigationBarHeight - shrinkedCopyScaledBounds.height)/2.0
+            let shrinkedCopyOriginNewYCoord: CGFloat = windowView.convert(CGPoint(x: 0.0, y: yDelta), from: titleView).y
+            
+            let copyLayer = underlabelCopy!.layer
+            let shrinkedCopyLayer = underlabelShrinkedCopy!.layer
+            
+            copyLayer.anchorPoint = CGPoint(x: 0, y: 0)
+            copyLayer.position.x -= copyLayer.bounds.width/2.0
+            copyLayer.position.y -= copyLayer.bounds.height/2.0
+            
+            shrinkedCopyLayer.anchorPoint = CGPoint(x: 0, y: 0)
+            shrinkedCopyLayer.position.x -= shrinkedCopyLayer.bounds.width/2.0
+            shrinkedCopyLayer.position.y -= shrinkedCopyLayer.bounds.height/2.0
+
+            let scale = CGAffineTransform.identity.scaledBy(x: scaleConstant, y:  scaleConstant)
+            
+            underlabelCopy!.alpha = 1.0
+            
+            
+            
+            UIView.animate(withDuration: 0.5, animations: { [weak self] in
+                self?.underlabelCopy!.transform = scale
+                self?.underlabelCopy!.frame.origin.x = shrinkedCopyOriginNewXCoord
+                self?.underlabelCopy!.frame.origin.y = shrinkedCopyOriginNewYCoord // titleViewOriginInWindow.y
+                self?.underlabelCopy!.alpha = 0.0
+                
+                self?.underlabelShrinkedCopy!.transform = scale
+                self?.underlabelShrinkedCopy!.frame.origin.x = shrinkedCopyOriginNewXCoord
+                self?.underlabelShrinkedCopy!.frame.origin.y = shrinkedCopyOriginNewYCoord // titleViewOriginInWindow.y
+                self?.underlabelShrinkedCopy!.alpha = 1.0
+                
+                }, completion: {
+                    [weak self] result in
+                    
+                    let oldFrame = self!.underlabelShrinkedCopy!.frame
+                    let newOrigin = windowView.convert(oldFrame.origin, to: self!.navigationItem.titleView!)
+                    
+                    let oldTransform = self!.underlabelShrinkedCopy!.transform
+                    
+                    
+                    if let underlabelShrinkedCopy = self?.underlabelShrinkedCopy {
+                        underlabelShrinkedCopy.removeFromSuperview()
+                        self!.navigationItem.titleView?.addSubview(underlabelShrinkedCopy)
+                        
+                        underlabelShrinkedCopy.frame = CGRect(x: newOrigin.x, y: newOrigin.y, width: oldFrame.width, height: oldFrame.height)
+                        underlabelShrinkedCopy.transform = oldTransform
+                    }
+                    
+            })
+            
+            
+        } else if underviewStatus == .shownPartially {
+            // continue dragging
+            
+            
+//            let offset = abs(scrollUnderView.contentOffset.y)
+//            let progress = offset / underviewHeightDefault
+            
+            
+            
+            
             
         }
+        
+        underviewLastStatus = underviewStatus
+        
     }
     
     fileprivate func recalcUnderviewHeightConstraint() {

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1C8C426C3307084C0B124D8C /* Pods_NavUnderView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B93BE00CBBA11775A8D2A71 /* Pods_NavUnderView.framework */; };
 		841CABAE1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841CABAD1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift */; };
+		84225B691F4AE601002700A4 /* B32TitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84225B681F4AE601002700A4 /* B32TitleView.swift */; };
 		845D2E931F3B0C360086B03F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845D2E921F3B0C360086B03F /* AppDelegate.swift */; };
 		845D2E981F3B0C360086B03F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 845D2E961F3B0C360086B03F /* Main.storyboard */; };
 		845D2E9A1F3B0C360086B03F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 845D2E991F3B0C360086B03F /* Assets.xcassets */; };
@@ -23,6 +24,7 @@
 		1F656A3F199874A0AD37E978 /* Pods-NavUnderView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NavUnderView.release.xcconfig"; path = "Pods/Target Support Files/Pods-NavUnderView/Pods-NavUnderView.release.xcconfig"; sourceTree = "<group>"; };
 		6B93BE00CBBA11775A8D2A71 /* Pods_NavUnderView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NavUnderView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		841CABAD1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationBar+setHideNavigationBarShadowView.swift"; sourceTree = "<group>"; };
+		84225B681F4AE601002700A4 /* B32TitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = B32TitleView.swift; sourceTree = "<group>"; };
 		845D2E8F1F3B0C360086B03F /* NavUnderView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NavUnderView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		845D2E921F3B0C360086B03F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		845D2E971F3B0C360086B03F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 				845D2E921F3B0C360086B03F /* AppDelegate.swift */,
 				845D2E961F3B0C360086B03F /* Main.storyboard */,
 				E64B4C041F3F89EC00F454B9 /* B32UnderView.swift */,
+				84225B681F4AE601002700A4 /* B32TitleView.swift */,
 				845D2EA41F3B0D200086B03F /* FirstViewController.swift */,
 				845D2EA61F3B0D2E0086B03F /* SecondViewController.swift */,
 				841CABAD1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift */,
@@ -222,6 +225,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E64B4C051F3F89EC00F454B9 /* B32UnderView.swift in Sources */,
+				84225B691F4AE601002700A4 /* B32TitleView.swift in Sources */,
 				845D2EA71F3B0D2E0086B03F /* SecondViewController.swift in Sources */,
 				841CABAE1F3CB562004366BF /* UINavigationBar+setHideNavigationBarShadowView.swift in Sources */,
 				845D2EA51F3B0D200086B03F /* FirstViewController.swift in Sources */,
