@@ -45,6 +45,11 @@ class SecondViewController: UIViewController {
     
     fileprivate var underlabelCopy: UILabel?
     fileprivate var underlabelShrinkedCopy: UILabel?
+    
+    fileprivate var underlabelCopyTransform: CGFloat!
+    fileprivate var underlabelCopyTransformScale: CGFloat!
+    fileprivate var underlabelCopyWindowOrigin: CGPoint!
+    fileprivate var underlabelCopyWindowOriginScaled: CGPoint!
 
     fileprivate var underLabel: UILabel! {
         return underView.label
@@ -65,7 +70,9 @@ class SecondViewController: UIViewController {
         installGestureRecognizer()
 
         createUnderView()
+        
         underView.barTintColor = navigationController?.navigationBar.barTintColor
+        
         if let underLabelText = underLabelText {
             underLabel.text = underLabelText
         }
@@ -94,9 +101,15 @@ class SecondViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        super.viewDidAppear(animated)
         
         navigationController?.delegate = self
+        
+        underlabelCopyWindowOrigin = view.window!.convert(underLabel.frame.origin, from: underLabel.superview)
+        underlabelCopyTransform = 1
+        
+        print("underlabelCopyWindowOrigin: \(underlabelCopyWindowOrigin)")
+        
     }
     
     func didRotated() {
@@ -389,24 +402,18 @@ extension SecondViewController : UIScrollViewDelegate {
             window.addSubview(underlabelCopy!)
             window.addSubview(underlabelShrinkedCopy!)
             
-            underLabel.textColor = UIColor.clear
+            let copyLayer = underlabelCopy!.layer
+            let shrinkedCopyLayer = underlabelShrinkedCopy!.layer
             
-        } else if underviewStatus == .shownPartially && underviewLastStatus == .hidden {
-            // starts to show
-            print("starts to show")
+            copyLayer.anchorPoint = CGPoint(x: 0, y: 0)
+            copyLayer.position.x -= copyLayer.bounds.width/2.0
+            copyLayer.position.y -= copyLayer.bounds.height/2.0
             
-        } else if underviewStatus == .shownFully && underviewLastStatus == .shownPartially {
-            // was shown fully
-            print("was shown fully")
-
-            removeViewsFromWindow()
+            shrinkedCopyLayer.anchorPoint = CGPoint(x: 0, y: 0)
+            shrinkedCopyLayer.position.x -= shrinkedCopyLayer.bounds.width/2.0
+            shrinkedCopyLayer.position.y -= shrinkedCopyLayer.bounds.height/2.0
             
-            underLabel.textColor = UIColor.black
-            
-        } else if underviewStatus == .hidden && underviewLastStatus == .shownPartially {
-            // was hidden
-            print("was hidden")
-            
+            // set scaled origin and transform
             let windowView: UIView = view.window!
             let titleView = navigationItem.titleView!
             
@@ -433,65 +440,68 @@ extension SecondViewController : UIScrollViewDelegate {
             let yDelta = (navigationBarHeight - shrinkedCopyScaledBounds.height)/2.0
             let shrinkedCopyOriginNewYCoord: CGFloat = windowView.convert(CGPoint(x: 0.0, y: yDelta), from: titleView).y
             
-            let copyLayer = underlabelCopy!.layer
-            let shrinkedCopyLayer = underlabelShrinkedCopy!.layer
+            underlabelCopyWindowOriginScaled = CGPoint(x: shrinkedCopyOriginNewXCoord, y: shrinkedCopyOriginNewYCoord)
+            underlabelCopyTransformScale = scaleConstant
             
-            copyLayer.anchorPoint = CGPoint(x: 0, y: 0)
-            copyLayer.position.x -= copyLayer.bounds.width/2.0
-            copyLayer.position.y -= copyLayer.bounds.height/2.0
+            print("underlabelCopyWindowOriginScaled: \(underlabelCopyWindowOriginScaled)")
             
-            shrinkedCopyLayer.anchorPoint = CGPoint(x: 0, y: 0)
-            shrinkedCopyLayer.position.x -= shrinkedCopyLayer.bounds.width/2.0
-            shrinkedCopyLayer.position.y -= shrinkedCopyLayer.bounds.height/2.0
+            underLabel.textColor = UIColor.clear
+            
+        } else if underviewStatus == .shownPartially && underviewLastStatus == .hidden {
+            // starts to show
+            print("starts to show")
+            
+        } else if underviewStatus == .shownFully && underviewLastStatus == .shownPartially {
+            // was shown fully
+            print("was shown fully")
 
-            let scale = CGAffineTransform.identity.scaledBy(x: scaleConstant, y:  scaleConstant)
+            removeViewsFromWindow()
             
-            underlabelCopy!.alpha = 1.0
+            underLabel.textColor = UIColor.black
             
+        } else if underviewStatus == .hidden && underviewLastStatus == .shownPartially {
+            // was hidden
+            print("was hidden")
+            let windowView: UIView = view.window!
+            let titleView = navigationItem.titleView!
             
+            let oldFrame = underlabelShrinkedCopy!.frame
+            let newOrigin = windowView.convert(oldFrame.origin, to: navigationItem.titleView!)
             
-            UIView.animate(withDuration: 0.5, animations: { [weak self] in
-                self?.underlabelCopy!.transform = scale
-                self?.underlabelCopy!.frame.origin.x = shrinkedCopyOriginNewXCoord
-                self?.underlabelCopy!.frame.origin.y = shrinkedCopyOriginNewYCoord // titleViewOriginInWindow.y
-                self?.underlabelCopy!.alpha = 0.0
+            let oldTransform = underlabelShrinkedCopy!.transform
+            
+            if let underlabelShrinkedCopy = underlabelShrinkedCopy {
+                underlabelShrinkedCopy.removeFromSuperview()
+                navigationItem.titleView?.addSubview(underlabelShrinkedCopy)
                 
-                self?.underlabelShrinkedCopy!.transform = scale
-                self?.underlabelShrinkedCopy!.frame.origin.x = shrinkedCopyOriginNewXCoord
-                self?.underlabelShrinkedCopy!.frame.origin.y = shrinkedCopyOriginNewYCoord // titleViewOriginInWindow.y
-                self?.underlabelShrinkedCopy!.alpha = 1.0
-                
-                }, completion: {
-                    [weak self] result in
-                    
-                    let oldFrame = self!.underlabelShrinkedCopy!.frame
-                    let newOrigin = windowView.convert(oldFrame.origin, to: self!.navigationItem.titleView!)
-                    
-                    let oldTransform = self!.underlabelShrinkedCopy!.transform
-                    
-                    
-                    if let underlabelShrinkedCopy = self?.underlabelShrinkedCopy {
-                        underlabelShrinkedCopy.removeFromSuperview()
-                        self!.navigationItem.titleView?.addSubview(underlabelShrinkedCopy)
-                        
-                        underlabelShrinkedCopy.frame = CGRect(x: newOrigin.x, y: newOrigin.y, width: oldFrame.width, height: oldFrame.height)
-                        underlabelShrinkedCopy.transform = oldTransform
-                    }
-                    
-            })
-            
+                underlabelShrinkedCopy.frame = CGRect(x: newOrigin.x, y: newOrigin.y, width: oldFrame.width, height: oldFrame.height)
+                underlabelShrinkedCopy.transform = oldTransform
+            }
             
         } else if underviewStatus == .shownPartially {
             // continue dragging
             
+            let offset = (underView.bounds.height - SecondViewController.underviewCollapsedHeight)
+            let progress = (1 - offset / (underviewHeightDefault - SecondViewController.underviewCollapsedHeight))
             
-//            let offset = abs(scrollUnderView.contentOffset.y)
-//            let progress = offset / underviewHeightDefault
+            underlabelCopy!.alpha = 1 - progress
+            underlabelShrinkedCopy!.alpha = progress
             
+            let xCoord = underlabelCopyWindowOrigin.x + (underlabelCopyWindowOriginScaled.x - underlabelCopyWindowOrigin.x) * progress
+            let yCoord = underlabelCopyWindowOrigin.y + (underlabelCopyWindowOriginScaled.y - underlabelCopyWindowOrigin.y) * progress
             
+            let scaleCoeff = 1.0 - (1.0 - underlabelCopyTransformScale) * progress
+            let scale = CGAffineTransform.identity.scaledBy(x: scaleCoeff, y: scaleCoeff)
+
+            print("progress: \(progress), underlabelCopy: \(CGPoint(x: xCoord, y: yCoord))")
+
+            underlabelCopy!.transform = scale
+            underlabelCopy!.frame.origin.x = xCoord
+            underlabelCopy!.frame.origin.y = yCoord
             
-            
-            
+            underlabelShrinkedCopy!.transform = scale
+            underlabelShrinkedCopy!.frame.origin.x = xCoord
+            underlabelShrinkedCopy!.frame.origin.y = yCoord
         }
         
         underviewLastStatus = underviewStatus
